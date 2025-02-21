@@ -1,5 +1,5 @@
 import torch
-from init_models import country_model
+from init_models import country_model, upsampler
 import cv2
 from paddleocr import PaddleOCR
 import numpy as np

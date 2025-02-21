@@ -8,3 +8,10 @@ services:
       - .:/project
     environment:
       - TZ=Asia/Bishkek
+    deploy:  
+      resources:
+        reservations:      
+          devices:
+            - driver: nvidia          
+              count: all
+              capabilities: [ gpu ]
