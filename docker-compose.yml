@@ -1,0 +1,10 @@
+services:
+  plate_rec:
+    build: .
+    container_name: plate_rec
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/project
+    environment:
+      - TZ=Asia/Bishkek
