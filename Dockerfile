@@ -36,8 +36,9 @@ RUN python3 -m pip install "git+https://github.com/ria-com/modelhub-client.git"
 
 COPY ./requirements.txt ./
 RUN pip install -r requirements.txt
+RUN apt update && apt install -y nano
 
-EXPOSE 8000
+EXPOSE 8989
 
 # Запуск приложения
 CMD ["python3", "manage.py"]
