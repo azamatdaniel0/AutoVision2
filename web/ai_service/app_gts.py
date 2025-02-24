@@ -166,11 +166,13 @@ def lp_det_reco(img_path):
                     combined_element_without_spaces = (
                         combined_element_without_spaces.replace("0", "Q", 1)
                     )
-                combined_element_without_spaces = texts[0][0]
+                else:
+                    combined_element_without_spaces = texts[0][0]
             case "KG":
                 number_text = texts[0][0]
                 number_text = list(number_text)
-                number_text.insert(2, "KG")
+                if number_text and number_text[0] == "G":
+                    number_text[0] = "0"
                 conf = confidences[0][0]
                 combined_element_without_spaces = "".join(number_text)
 
