@@ -3,6 +3,7 @@ import os
 from fastai.learner import load_learner
 from basicsr.archs.rrdbnet_arch import RRDBNet
 from realesrgan import RealESRGANer
+from ultralytics import YOLO
 
 def download_model(model_url, model_name):
     model_path = os.path.join('weights', model_name + '.pt')
@@ -21,6 +22,9 @@ country_model = load_learner(country_model_path)
 model_name = 'RealESRGAN_x4plus'
 model_url = ['https://cloud.sanarip.org/index.php/s/2XfFdM4CJt52rmm/download/RealESRGAN_x4plus.pth']
 real_esrgan_model_path = download_model(model_url, model_name)
+
+body_classification_path = "./data/models/body_classification/best.pt"
+body_classification_model = YOLO(body_classification_path)
 
 model_RDB =RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=4)
 upsampler = RealESRGANer(

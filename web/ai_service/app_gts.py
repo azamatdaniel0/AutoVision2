@@ -1,5 +1,6 @@
 import torch
 from init_models import country_model, upsampler
+from web.ai_service.body_classification import predict as body_classification
 import cv2
 from paddleocr import PaddleOCR
 import numpy as np
@@ -129,6 +130,8 @@ def lp_det_reco(img_path):
         print(e)
 
     try:
+        if len(images_bboxs[0]) == 0:
+            raise Exception("Plate number is not recognized")
         x_min, y_min, x_max, y_max, _, plate_type, _ = images_bboxs[0][0]
         if not plate_type in PLATE_TYPES or PLATE_TYPES[plate_type] != "numberplate":
             raise Exception("Plate number is not recognized")
@@ -192,6 +195,10 @@ def lp_det_reco(img_path):
         combined_element_without_spaces = None
         conf = None
         country = [None, None]
+
+    body_classification_result = body_classification(img_path)
+    car_type_body = body_classification_result['car_type_body']
+    car_type_body_score = body_classification_result['car_type_body_score']
     return {
         "license_plate_number": combined_element_without_spaces,
         "license_plate_number_score": conf,
@@ -201,6 +208,6 @@ def lp_det_reco(img_path):
         "car_brand_score": 0.9997,
         "car_color": "grey",
         "car_color_score": 0.9911,
-        "car_type_body": "SUV",
-        "car_type_body_score": 1
+        "car_type_body": car_type_body,
+        "car_type_body_score": car_type_body_score
     }

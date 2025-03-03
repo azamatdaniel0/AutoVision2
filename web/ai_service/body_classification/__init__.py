@@ -1,11 +1,8 @@
 import time
-from ultralytics import YOLO
 import torch
-from decouple import config
+from init_models import body_classification_model as model
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-MODEL_PATH = config("MODEL_PATH")
-model = YOLO(MODEL_PATH)
 
 def predict(image_path):
     try:
