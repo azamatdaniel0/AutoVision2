@@ -15,6 +15,7 @@ import time
 
 start_time = time.time()
 number_plate_detection_and_reading = pipeline("number_plate_detection_and_reading",
+                                              path_to_model="modelhub://yolov11x_brand_np",
                                               image_loader="opencv")
 print(f"Pipeline initialization took {time.time() - start_time:.2f} seconds")
 
@@ -91,7 +92,10 @@ def preprocess(img):
 SYMBOLS = {
     "-", "#", "_", "+", "=", "!", "@", "$", "%", "*", "&", "(", ")", "^", "/", "|", ";", ":", ".", ",", "·", "<", ">", "[", "]"
 }
-
+PLATE_TYPES = {
+    0: "numberplate", 1: "brand_numberplate",
+    2: "filled_numberplate", 3: "empty_numberplate"
+}
 @measure_time
 def del_symbols(input_string):
     return ''.join(char for char in input_string if char not in SYMBOLS)
@@ -125,9 +129,9 @@ def lp_det_reco(img_path):
         print(e)
 
     try:
-        # lp lines
-        print(images_bboxs[0][0])
-        x_min, y_min, x_max, y_max, _, _, _ = images_bboxs[0][0]
+        x_min, y_min, x_max, y_max, _, plate_type, _ = images_bboxs[0][0]
+        if not plate_type in PLATE_TYPES or PLATE_TYPES[plate_type] != "numberplate":
+            raise Exception("Plate number is not recognized")
         x_min, y_min, x_max, y_max = int(x_min), int(y_min), int(x_max), int(y_max)
         print(x_min, y_min, x_max, y_max)
         pro = preprocess(images[0][y_min:y_max, x_min:x_max])
