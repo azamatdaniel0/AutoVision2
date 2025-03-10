@@ -183,7 +183,8 @@ def lp_det_reco(img_path):
                 conf = confidences[0][0]
                 combined_element_without_spaces = "".join(number_text)
 
-            # OCR if this is other country license plates
+            case "UZ":
+                combined_element_without_spaces, conf = paddle(img_enh, "en")
             case _:
                 conf = confidences[0][0]
                 combined_element_without_spaces = texts[0][0]
