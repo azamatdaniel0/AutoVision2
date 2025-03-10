@@ -175,13 +175,46 @@ def lp_det_reco(img_path):
                     )
                 else:
                     combined_element_without_spaces = texts[0][0]
+                    
             case "KG":
-                number_text = texts[0][0]
-                number_text = list(number_text)
-                if number_text and number_text[0] == "G":
-                    number_text[0] = "0"
-                conf = confidences[0][0]
-                combined_element_without_spaces = "".join(number_text)
+                number_text = texts[0][0] if texts and texts[0] else ""
+
+                if number_text:
+                    number_text = list(number_text)  # Преобразуем строку в список для редактирования
+
+                    if number_text[0] == "G":
+                        number_text[0] = "0"
+
+                    # Попробуем получить второй символ и преобразовать его в число
+                    second_char_int = None
+                    if len(number_text) > 1 and number_text[1].isdigit():
+                        second_char_int = int(number_text[1])
+
+                    if (
+                        number_text[0] == "0"
+                        and second_char_int is not None
+                        and second_char_int != 0
+                        and len(number_text) >= 6
+                    ):
+                        number_text.insert(2, "KG")
+
+                conf = confidences[0][0] if confidences and confidences[0] else 0.0
+                combined_element_without_spaces = "".join(number_text) if number_text else ""
+
+            case "RU" | "KZ":
+                # Use paddleOCR if squared number plate
+                if count_lines[0][0] >= 2:
+                    combined_element_without_spaces, conf = paddle(img_enh, "en")
+                    combined_element_without_spaces = (
+                        combined_element_without_spaces.replace("KZ", "")
+                    )
+                else:
+                    # Takes values from nomeroff-net
+                    conf = confidences[0][0]
+                    combined_element_without_spaces = texts[0][0]
+
+            case "UZ":
+                combined_element_without_spaces, conf = paddle(img_enh, "en")
 
             case "UZ":
                 combined_element_without_spaces, conf = paddle(img_enh, "en")
