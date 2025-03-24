@@ -10,9 +10,9 @@ fastai
 fastapi
 setuptools
 SQLAlchemy
-paddlepaddle
 python-multipart
 python-decouple
+paddlepaddle-gpu
 paddleocr
 asyncpg
 realesrgan
