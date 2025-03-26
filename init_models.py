@@ -26,6 +26,9 @@ real_esrgan_model_path = download_model(model_url, model_name)
 body_classification_path = "./data/models/body_classification/best.pt"
 body_classification_model = YOLO(body_classification_path)
 
+orientation_path = "./data/models/orientation_classification/best.pt"
+orientation_model = YOLO(orientation_path)
+
 model_RDB =RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=4)
 upsampler = RealESRGANer(
     scale=4,

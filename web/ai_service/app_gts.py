@@ -1,6 +1,7 @@
 import torch
 from init_models import country_model, upsampler
 from web.ai_service.body_classification import predict as body_classification
+from web.ai_service.orientation_classification import predict as orientation_classification
 import cv2
 from paddleocr import PaddleOCR
 import numpy as np
@@ -215,9 +216,6 @@ def lp_det_reco(img_path):
 
             case "UZ":
                 combined_element_without_spaces, conf = paddle(img_enh, "en")
-
-            case "UZ":
-                combined_element_without_spaces, conf = paddle(img_enh, "en")
             case _:
                 conf = confidences[0][0]
                 combined_element_without_spaces = texts[0][0]
@@ -233,11 +231,17 @@ def lp_det_reco(img_path):
     body_classification_result = body_classification(img_path)
     car_type_body = body_classification_result['car_type_body']
     car_type_body_score = body_classification_result['car_type_body_score']
+
+    orientation_classification_result = orientation_classification(img_path)
+    orientation = orientation_classification_result['orientation']
+    orientation_score = orientation_classification_result['orientation_score']
     return {
         "license_plate_number": combined_element_without_spaces,
         "license_plate_number_score": conf,
         "license_plate_country": country[0],
         "license_plate_country_score": country[1],
+        "orientation": orientation,
+        "orientation_score": orientation_score,
         "car_brand": "BMW_crop",
         "car_brand_score": 0.9997,
         "car_color": "grey",
