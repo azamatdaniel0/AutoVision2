@@ -1,6 +1,6 @@
 import time
 import torch
-from init_models import body_classification_model as model
+from init_models import orientation_model as model
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -26,6 +26,6 @@ def predict(image_path):
         predicted_label = None
         confidence_score = None
     return {
-        "car_type_body": predicted_label,
-        "car_type_body_score": confidence_score
+        "orientation": predicted_label,
+        "orientation_score": confidence_score
     }

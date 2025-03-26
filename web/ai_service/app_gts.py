@@ -1,6 +1,7 @@
 import torch
 from init_models import country_model, upsampler
 from web.ai_service.body_classification import predict as body_classification
+from web.ai_service.orientation_classification import predict as orientation_classification
 import cv2
 from paddleocr import PaddleOCR
 import numpy as np
@@ -33,7 +34,7 @@ def measure_time(func):
 # PaddleOCR takes cv2 image
 @measure_time
 def paddle(img, lang):
-    recognition = PaddleOCR(use_angle_cls=True, lang=lang, det=False, gpu_mem=2048, show_log=False)
+    recognition = PaddleOCR(use_angle_cls=True, lang=lang, det=False)
     result = recognition.ocr(img)
     results_array = []
     confidences_array = []
@@ -173,76 +174,33 @@ def lp_det_reco(img_path):
                     combined_element_without_spaces = (
                         combined_element_without_spaces.replace("0", "Q", 1)
                     )
-                # else:
-                #     combined_element_without_spaces = texts[0][0]
+                else:
+                    combined_element_without_spaces = texts[0][0]
                     
             case "KG":
-                if count_lines[0][0] >= 2:
-                    square_w = int(W / 2.7)  # Adjust the size as needed
-                    square_h = int(H / 2)
-                    black_square = np.zeros((square_h, square_w, 3), dtype=np.uint8)
-                    img_enh[(-square_h):, :square_w] = black_square
-                    
-                    combined_element_without_spaces, conf = paddle(img_enh, "en")
-                    combined_element_without_spaces = (
-                        del_symbols(combined_element_without_spaces).replace("KG", "")
-                    )
-                    
-                    Kg_new_put = list(combined_element_without_spaces)
+                number_text = texts[0][0] if texts and texts[0] else ""
 
-                    # If the first character is 'G', convert it to '0'
-                    # (Sometimes OCR might see 'G' for '0', etc.)
-                    if Kg_new_put and Kg_new_put[0] == "G":
-                        Kg_new_put[0] = "0"
-                    
-                    # Debug-print the characters and their ASCII codes
-                    print("[DEBUG] OCR result after cleaning =", combined_element_without_spaces)
-                    for i, ch in enumerate(Kg_new_put):
-                        print(f"[DEBUG] idx={i}, char='{ch}', ASCII={ord(ch)}")
+                if number_text:
+                    number_text = list(number_text)  # Преобразуем строку в список для редактирования
 
-                    # Safely check if second character is a digit, etc.
-                    if len(Kg_new_put) >= 2:
-                        try:
-                            # Attempt to parse the second character as int
-                            second_char_int = int(Kg_new_put[1])  # May raise ValueError
-                        except ValueError:
-                            second_char_int = None
+                    if number_text[0] == "G":
+                        number_text[0] = "0"
 
-                        # Only insert "KG" if first is '0', second is a digit != 0,
-                        # and length is at least 6
-                        if (
-                            Kg_new_put[0] == "0"
-                            and second_char_int is not None
-                            and second_char_int != 0
-                            and len(Kg_new_put) >= 6
-                        ):
-                            Kg_new_put.insert(2, "KG")
+                    # Попробуем получить второй символ и преобразовать его в число
+                    second_char_int = None
+                    if len(number_text) > 1 and number_text[1].isdigit():
+                        second_char_int = int(number_text[1])
 
-                    combined_element_without_spaces = "".join(Kg_new_put)
-                else:
-                    number_text = texts[0][0] if texts and texts[0] else ""
+                    if (
+                        number_text[0] == "0"
+                        and second_char_int is not None
+                        and second_char_int != 0
+                        and len(number_text) >= 6
+                    ):
+                        number_text.insert(2, "KG")
 
-                    if number_text:
-                        number_text = list(number_text)  # Преобразуем строку в список для редактирования
-
-                        if number_text[0] == "G":
-                            number_text[0] = "0"
-
-                        # Попробуем получить второй символ и преобразовать его в число
-                        second_char_int = None
-                        if len(number_text) > 1 and number_text[1].isdigit():
-                            second_char_int = int(number_text[1])
-
-                        if (
-                            number_text[0] == "0"
-                            and second_char_int is not None
-                            and second_char_int != 0
-                            and len(number_text) >= 6
-                        ):
-                            number_text.insert(2, "KG")
-
-                    conf = confidences[0][0] if confidences and confidences[0] else 0.0
-                    combined_element_without_spaces = "".join(number_text) if number_text else ""
+                conf = confidences[0][0] if confidences and confidences[0] else 0.0
+                combined_element_without_spaces = "".join(number_text) if number_text else ""
 
             case "RU" | "KZ":
                 # Use paddleOCR if squared number plate
@@ -258,7 +216,6 @@ def lp_det_reco(img_path):
 
             case "UZ":
                 combined_element_without_spaces, conf = paddle(img_enh, "en")
-
             case _:
                 conf = confidences[0][0]
                 combined_element_without_spaces = texts[0][0]
@@ -273,16 +230,18 @@ def lp_det_reco(img_path):
 
     body_classification_result = body_classification(img_path)
     car_type_body = body_classification_result['car_type_body']
-    if car_type_body == "Pick-Up" or car_type_body == "":
-        car_type_body = "Truck"
     car_type_body_score = body_classification_result['car_type_body_score']
 
-    
+    orientation_classification_result = orientation_classification(img_path)
+    orientation = orientation_classification_result['orientation']
+    orientation_score = orientation_classification_result['orientation_score']
     return {
         "license_plate_number": combined_element_without_spaces,
         "license_plate_number_score": conf,
         "license_plate_country": country[0],
         "license_plate_country_score": country[1],
+        "orientation": orientation,
+        "orientation_score": orientation_score,
         "car_brand": "BMW_crop",
         "car_brand_score": 0.9997,
         "car_color": "grey",
