@@ -11,7 +11,7 @@ perl/*
 cofig/*.json
 source/*
 ./.pypirc
-web/media/
+web/media/*
 # datasets
 lightning_logs
 datasets/*
