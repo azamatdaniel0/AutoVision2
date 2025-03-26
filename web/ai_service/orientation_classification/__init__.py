@@ -16,6 +16,7 @@ def predict(image_path):
             confidence = max(probs)
             predicted_label = class_name
             confidence_score = confidence
+            confidence_score = round(confidence_score, 4)
             print("time: ", time.time() - start_time)
         else:
             predicted_label = None
