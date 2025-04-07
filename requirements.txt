@@ -1,33 +1,34 @@
-torch>=1.12
+torch==1.13.1
 basicsr==1.4.2
 pytorch_lightning==1.8.6
+torchvision==0.14.1
 ultralytics>=8.3.12
 craft_text_detector @ git+https://github.com/ria-com/craft-text-detector.git
 PyTurboJPEG @ git+https://github.com/lilohuang/PyTurboJPEG.git
 modelhub_client @ git+https://github.com/ria-com/modelhub-client.git
-cython
-fastai
-fastapi
-setuptools
-SQLAlchemy
-python-multipart
-python-decouple
-paddlepaddle-gpu
-paddleocr
-asyncpg
-realesrgan
-aiofiles
-uvicorn
-numpy
+cython==3.0.12
+fastai==2.7.18
+fastapi==0.115.12
+setuptools==65.5.0
+SQLAlchemy==2.0.38
+python-multipart==0.0.20
+python-decouple==3.8
+paddlepaddle-gpu==2.6.2
+paddleocr==2.9.1
+asyncpg==0.30.0
+realesrgan==0.3.0
+aiofiles==24.1.0
+uvicorn==0.34.0
+numpy==1.26.4
 opencv_python
 scikit_image
-asyncio
-gitpython
-pycocotools
-ujson
+asyncio==3.4.3
+gitpython==3.1.42
+pycocotools==2.0.8
+ujson==5.10.0
 pillow
 tqdm
-matplotlib
+matplotlib==3.10.1
 scipy
 PyYAML>=5.4
 seaborn
@@ -36,7 +37,6 @@ gevent
 termcolor
 scikit-learn
 albumentations
-torchvision>=0.13.1
 # git repos
 #upscaler @ git+https://github.com/ria-com/upscaler.git
 
